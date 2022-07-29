@@ -1,0 +1,53 @@
+CREATE DATABASE database_task;
+
+/* Create table stucture*/
+CREATE TABLE drinkMenu(
+beverage_category VARCHAR(60),
+beverage VARCHAR(60),
+beverage_prep VARCHAR(40),
+calories INT,
+total_fat_g VARCHAR(20), /* Needs Preperation to set the rgiht data type */
+trans_fat_g FLOAT,
+saturated_fat_g FLOAT,
+sodium_mg INT,
+total_carbohydrates_g INT,
+cholesterol_mg INT, 
+dietary_fibre_g INT, 
+sugars_g INT, 
+protein_g FLOAT,
+vitamin_A_DV VARCHAR(10),
+vitamin_C_DV VARCHAR(10), 
+calcium_DV VARCHAR(10),
+iron_DV VARCHAR(10),
+caffeine_mg VARCHAR(10));
+
+/* Insert data from csv file into the new table*/
+BULK INSERT dbo.drinkMenu
+FROM 'C:\et3_task\drinkMenu.csv' /* Change to the location of your drinkMenu.csv */
+WITH
+(
+        FORMAT='CSV',
+        FIRSTROW=2,
+		ROWTERMINATOR = '0x0a',
+		CODEPAGE = '65001', 
+		DATAFILETYPE = 'Char'
+)
+
+SELECT * FROM drinkMenu;
+
+/* Which drink has the highest calories from the dataset ? */
+SELECT TOP 1 beverage_category, beverage, beverage_prep, max(calories) as max_calories
+From drinkMenu
+GROUP BY beverage_category, beverage, beverage_prep
+ORDER BY max_calories DESC
+
+/* What is the average calorie amount for each drink category ? */
+SELECT beverage_category, AVG(calories) as avg_calories
+FROM drinkMenu
+GROUP BY beverage_category
+ORDER BY avg_calories
+
+/* Which drinks have below average calorie amount ? */
+SELECT beverage_category, beverage, beverage_prep, calories
+FROM drinkMenu
+where calories < (SELECT AVG(calories) FROM drinkMenu); /* AVG(Calories) is 193 */
